@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.web.WebView?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
+<?import org.controlsfx.glyphfont.*?>
+<Tab xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
+     fx:controller="org.masanek.TabController" fx:id="tab">
+    <BorderPane prefHeight="200.0" prefWidth="200.0">
+        <top>
+            <SplitPane dividerPositions="0.5" orientation="VERTICAL" BorderPane.alignment="CENTER">
+                <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0">
+                    <Button fx:id="previousButton" disable="true" mnemonicParsing="false" onAction="#loadPrevious">
+                        <graphic>
+                            <Glyph fontFamily="FontAwesome" icon="CHEVRON_LEFT"/>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="nextButton" disable="true" mnemonicParsing="false" onAction="#loadNext">
+                        <graphic>
+                            <Glyph fontFamily="FontAwesome" icon="CHEVRON_RIGHT"/>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="reloadButton" mnemonicParsing="false" onAction="#reload">
+                        <graphic>
+                            <Glyph fontFamily="FontAwesome" icon="REFRESH"/>
+                        </graphic>
+                    </Button>
+                    <Button fx:id="homeButton" mnemonicParsing="false" onAction="#home">
+                        <graphic>
+                            <Glyph fontFamily="FontAwesome" icon="HOME"/>
+                        </graphic>
+                    </Button>
+                    <CustomTextField fx:id="urlTextField" prefWidth="1500.0" promptText="Webseite" onAction="#onUrlField">
+                        <right>
+                            <Glyph fontFamily="FontAwesome" icon="SEARCH"/>
+                        </right>
+                    </CustomTextField>
+                    <CustomTextField fx:id="googleTextField" prefWidth="500.0" promptText="Suche mit Google">
+                        <right>
+                            <Glyph fontFamily="FontAwesome" icon="GOOGLE"/>
+                        </right>
+                    </CustomTextField>
+                    <MenuButton mnemonicParsing="false">
+                        <items>
+                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                        </items>
+                        <graphic>
+                            <Glyph fontFamily="FontAwesome" icon="NAVICON"/>
+                        </graphic>
+                    </MenuButton>
+                    <ChoiceBox prefWidth="150.0">
+
+                    </ChoiceBox>
+                </ToolBar>
+                <ToolBar prefHeight="40.0" prefWidth="200.0">
+                    <Button mnemonicParsing="false" text="Bookmark 1"/>
+                </ToolBar>
+            </SplitPane>
+        </top>
+        <center>
+            <WebView fx:id="webView" BorderPane.alignment="CENTER"/>
+        </center>
+        <bottom>
+            <ToolBar onMouseClicked="#showProgressInfo" BorderPane.alignment="CENTER_RIGHT">
+                <Label fx:id="statusLabel"/>
+                <ProgressBar fx:id="progressBar" prefWidth="200.0" progress="0.0"/>
+            </ToolBar>
+        </bottom>
+    </BorderPane>
+</Tab>
