@@ -1,6 +1,7 @@
 package org.masanek;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
@@ -15,22 +16,21 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Scanner;
 
-public class MainPageController {
+public class BrowserController {
 
-    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/538.19 (KHTML, like Gecko) Safari/538.19";
-
+    private static final String GOOGLE_FAVICON_PROVIDER_URL = "http://www.google.com/s2/favicons?domain_url=%s";
 
     public TabPane tabPane;
     public BorderPane window;
+    public ToolBar sideBar;
+    public Button themeSwitcherButton;
+
     @FXML
-    private Button newTabButton;
+    private Button addTabButton;
 
     @FXML
     private void initialize() {
-
-        newTabButton.setOnAction(action -> {
-            this.createTab("https://google.com");
-        });
+        addTabButton.setOnAction(action -> this.createTab("https://google.com"));
     }
 
     private void createTab(final String url) {
@@ -74,7 +74,7 @@ public class MainPageController {
 
         tabController.webView.getEngine().locationProperty().addListener((observable, oldValue, newValue) -> {
             try {
-                final String faviconUrl = String.format("http://www.google.com/s2/favicons?domain_url=%s", URLEncoder.encode(newValue, "UTF-8"));
+                final String faviconUrl = String.format(GOOGLE_FAVICON_PROVIDER_URL, URLEncoder.encode(newValue, "UTF-8"));
                 final Image favicon = new Image(faviconUrl, true);
                 final ImageView iv = new ImageView(favicon);
                 tabController.tab.setGraphic(iv);
@@ -90,7 +90,7 @@ public class MainPageController {
                     tabController.reload();
                     break;
                 case F12:
-                    final String firebugJs = new Scanner(MainPageController.class.getResourceAsStream("/js/initFirebug.js")).useDelimiter("\\A").next();
+                    final String firebugJs = new Scanner(BrowserController.class.getResourceAsStream("/js/initFirebug.js")).useDelimiter("\\A").next();
                     tabController.webView.getEngine().executeScript(firebugJs);
                     break;
             }
@@ -108,8 +108,18 @@ public class MainPageController {
             e.printStackTrace();
         }
         final TabController controller = loader.getController();
-        controller.webView.getEngine().setUserAgent(USER_AGENT);
         controller.webView.getEngine().load(url);
         return controller;
+    }
+
+    public void switchTheme() {
+        final ObservableList<String> stylesheets = themeSwitcherButton.getScene().getStylesheets();
+        if (stylesheets.contains(Main.DARK_THEME_LOCATION)) {
+            stylesheets.remove(Main.DARK_THEME_LOCATION);
+            themeSwitcherButton.setTooltip(new Tooltip("Turn off the lights!"));
+        } else {
+            stylesheets.add(Main.DARK_THEME_LOCATION);
+            themeSwitcherButton.setTooltip(new Tooltip("Turn on the lights!"));
+        }
     }
 }

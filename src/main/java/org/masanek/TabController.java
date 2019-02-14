@@ -1,68 +1,123 @@
 package org.masanek;
 
+import impl.org.controlsfx.autocompletion.AutoCompletionTextFieldBinding;
+import impl.org.controlsfx.autocompletion.SuggestionProvider;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.controlsfx.control.PopOver;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 public class TabController {
 
     public static final String HOMEPAGE = "https://google.com";
     private static final String ERROR_PAGE = "/html/404.html";
 
-    @FXML
+    private final SuggestionProvider<String> urlSuggestionProvider = SuggestionProvider.create(Collections.emptyList());
+
     public CustomTextField urlTextField;
-
-    @FXML
     public CustomTextField googleTextField;
-
-    @FXML
     public ToolBar toolbar;
-
-    @FXML
     public Tab tab;
-
-    @FXML
     public WebView webView;
-    @FXML
     public Button previousButton;
-    @FXML
     public Button nextButton;
-    public Button reloadButton;
     public Label statusLabel;
     public ProgressBar progressBar;
 
-    AutoCompletionBinding<String> currentBinding;
-
     @FXML
     private void initialize() throws Exception {
+        final AutoCompletionTextFieldBinding<String> binding = new AutoCompletionTextFieldBinding<>(urlTextField, urlSuggestionProvider);
+        binding.setPrefWidth(urlTextField.getPrefWidth());
+        binding.setMinWidth(urlTextField.getMinWidth());
+        binding.setMaxWidth(urlTextField.getMaxWidth());
+
         setupClearButtonField(urlTextField);
         setupClearButtonField(googleTextField);
 
-        webView.setContextMenuEnabled(false);
-        this.createContextMenu(webView);
+        this.patchWebViewTrustManager();
+        this.patchWebViewContextMenu();
+
+        urlTextField.textProperty().addListener((observable, oldValue, newValue) -> this.suggestUrls());
 
         webView.getEngine().locationProperty().addListener((observable, oldValue, newValue) -> {
-            if (!webView.getEngine().getHistory().getEntries().isEmpty()) {
-                previousButton.setDisable(false);
-            }
+            final WebHistory history = webView.getEngine().getHistory();
+            final int currentIndex = history.getCurrentIndex();
+            previousButton.setDisable(currentIndex == 1);
+
             urlTextField.setText(newValue);
         });
 
         webView.getEngine().getLoadWorker().exceptionProperty().addListener((obs, oldValue, newValue) -> {
-            final URL page404 = MainPageController.class.getResource(ERROR_PAGE);
+            final URL page404 = BrowserController.class.getResource(ERROR_PAGE);
             webView.getEngine().load(page404.toExternalForm());
         });
+    }
+
+    private void suggestUrls() {
+        // TODO: Provide suggestions from all tabs, not just current one
+        urlSuggestionProvider.clearSuggestions();
+        if (urlTextField.getText().isEmpty()) {
+            urlSuggestionProvider.addPossibleSuggestions(webView.getEngine().getHistory().getEntries().stream().limit(10).map(WebHistory.Entry::getUrl).collect(Collectors.toList()));
+        } else {
+            urlSuggestionProvider.addPossibleSuggestions(webView.getEngine().getHistory().getEntries().stream()
+                    .map(WebHistory.Entry::getUrl)
+                    .filter(url -> url.toLowerCase().contains(urlTextField.getText().toLowerCase()))
+                    .distinct()
+                    .limit(10)
+                    .collect(Collectors.toList()));
+        }
+    }
+
+    /**
+     * Disables SSL certificate validation.
+     * <p/>
+     * <a href="https://stackoverflow.com/questions/22605701/javafx-webview-not-working-using-a-untrusted-ssl-certificate">Stack Overflow</a>
+     */
+    private void patchWebViewTrustManager() {
+        // Create a trust manager that does not validate certificate chains
+        final TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+
+                    @Override
+                    public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
+                    }
+                }
+        };
+
+        // Install the all-trusting trust manager
+        try {
+            final SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (final GeneralSecurityException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void setupClearButtonField(final CustomTextField customTextField) throws Exception {
@@ -78,14 +133,22 @@ public class TabController {
 
     @FXML
     public void loadPrevious() {
-        final WebEngine engine = webView.getEngine();
-        final WebHistory.Entry entry = engine.getHistory().getEntries().get(engine.getHistory().getCurrentIndex() - 1);
-        engine.load(entry.getUrl());
+        nextButton.setDisable(false);
+        final WebHistory history = webView.getEngine().getHistory();
+        final ObservableList<WebHistory.Entry> entryList = history.getEntries();
+        final int currentIndex = history.getCurrentIndex();
+
+        Platform.runLater(() -> history.go(entryList.size() > 1 && currentIndex > 0 ? -1 : 0));
     }
 
     @FXML
     public void loadNext() {
+        final WebHistory history = webView.getEngine().getHistory();
+        final ObservableList<WebHistory.Entry> entryList = history.getEntries();
+        final int currentIndex = history.getCurrentIndex();
 
+        // TODO disable next button if there is no fullHistory
+        Platform.runLater(() -> history.go(entryList.size() > 1 && currentIndex < entryList.size() - 1 ? 1 : 0));
     }
 
     @FXML
@@ -108,15 +171,18 @@ public class TabController {
         popOver.show(progressBar);
     }
 
-    private void createContextMenu(final WebView webView) {
-        final ContextMenu contextMenu = new ContextMenu();
+    private void patchWebViewContextMenu() {
+        webView.setContextMenuEnabled(false);
+
         final MenuItem reload = new MenuItem("Reload");
-        reload.setOnAction(e -> webView.getEngine().reload());
-        final MenuItem savePage = new MenuItem("Save Page");
-        savePage.setOnAction(e -> System.out.println("Save page..."));
-        final MenuItem hideImages = new MenuItem("Hide Images");
-        hideImages.setOnAction(e -> System.out.println("Hide Images..."));
-        contextMenu.getItems().addAll(reload, savePage, hideImages);
+        reload.setOnAction(e -> this.reload());
+        final MenuItem goBack = new MenuItem("Go back");
+        goBack.setOnAction(e -> this.loadPrevious());
+        final MenuItem next = new MenuItem("Next");
+        next.setOnAction(e -> this.loadNext());
+
+        final ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().addAll(reload, goBack, next);
 
         webView.setOnMousePressed(e -> {
             if (e.getButton() == MouseButton.SECONDARY) {

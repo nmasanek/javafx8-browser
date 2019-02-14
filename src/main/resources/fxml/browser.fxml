@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import org.controlsfx.glyphfont.Glyph?>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="window"
+            fx:controller="org.masanek.BrowserController">
+    <center>
+        <TabPane fx:id="tabPane" BorderPane.alignment="CENTER">
+            <!-- TODO: Add homepage tab -->
+        </TabPane>
+    </center>
+    <left>
+        <ToolBar fx:id="sideBar" orientation="VERTICAL" BorderPane.alignment="CENTER">
+            <Button BorderPane.alignment="CENTER" fx:id="addTabButton">
+                <graphic>
+                    <Glyph fontFamily="FontAwesome" icon="PLUS"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Add new tab!"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="themeSwitcherButton" onAction="#switchTheme">
+                <graphic>
+                    <Glyph fontFamily="FontAwesome" icon="LIGHTBULB_ALT"/>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Turn off the lights!"/>
+                </tooltip>
+            </Button>
+            <Button mnemonicParsing="false">
+                <graphic>
+                    <Glyph fontFamily="FontAwesome" icon="HISTORY"/>
+                </graphic>
+            </Button>
+        </ToolBar>
+    </left>
+</BorderPane>

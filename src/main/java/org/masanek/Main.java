@@ -6,24 +6,26 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import org.controlsfx.glyphfont.FontAwesome;
 
 import javax.swing.*;
 import java.io.File;
 
 public class Main extends Application {
 
+    public static final String DARK_THEME_LOCATION= "/css/modena_dark.css";
+
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fxml/MainPageController.fxml"));
-        BorderPane page = loader.load();
+    public void start(final Stage primaryStage) throws Exception {
+        final FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fxml/browser.fxml"));
+        final BorderPane page = loader.load();
 
-        Scene scene = new Scene(page);
+        final Scene scene = new Scene(page);
         scene.getStylesheets().add("/css/custom.css");
+        scene.getStylesheets().add(DARK_THEME_LOCATION);
 
-        File dir = new File(new JFileChooser().getFileSystemView().getDefaultDirectory() + "/Internot Explorer");
+        final File dir = new File(new JFileChooser().getFileSystemView().getDefaultDirectory() + "/Internot Explorer");
         dir.mkdirs();
-        File file = new File(dir.toPath().toAbsolutePath() + "/test.txt");
+        final File file = new File(dir.toPath().toAbsolutePath() + "/test.txt");
         file.createNewFile();
 
         primaryStage.setTitle("Internot Explorer - Der einzig gute Brauser");
@@ -32,7 +34,7 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         Main.launch();
     }
 }

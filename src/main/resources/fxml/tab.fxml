@@ -6,7 +6,8 @@
 <?import org.controlsfx.control.textfield.CustomTextField?>
 <?import org.controlsfx.glyphfont.*?>
 <Tab xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-     fx:controller="org.masanek.TabController" fx:id="tab">
+     fx:controller="org.masanek.TabController"
+     fx:id="tab">
     <BorderPane prefHeight="200.0" prefWidth="200.0">
         <top>
             <SplitPane dividerPositions="0.5" orientation="VERTICAL" BorderPane.alignment="CENTER">
@@ -21,12 +22,12 @@
                             <Glyph fontFamily="FontAwesome" icon="CHEVRON_RIGHT"/>
                         </graphic>
                     </Button>
-                    <Button fx:id="reloadButton" mnemonicParsing="false" onAction="#reload">
+                    <Button mnemonicParsing="false" onAction="#reload">
                         <graphic>
                             <Glyph fontFamily="FontAwesome" icon="REFRESH"/>
                         </graphic>
                     </Button>
-                    <Button fx:id="homeButton" mnemonicParsing="false" onAction="#home">
+                    <Button mnemonicParsing="false" onAction="#home">
                         <graphic>
                             <Glyph fontFamily="FontAwesome" icon="HOME"/>
                         </graphic>
