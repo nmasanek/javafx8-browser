@@ -1,37 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import org.controlsfx.glyphfont.Glyph?>
 <BorderPane xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
             fx:id="window"
-            fx:controller="org.masanek.BrowserController">
+            fx:controller="org.masanek.BrowserController"
+            stylesheets="/css/bootstrap3.css">
     <center>
-        <TabPane fx:id="tabPane" BorderPane.alignment="CENTER">
-            <!-- TODO: Add homepage tab -->
+        <TabPane fx:id="tabPane" tabMaxWidth="200" tabClosingPolicy="ALL_TABS">
+            <!-- dummy tab to act as a button container -->
+            <Tab disable="true" closable="false" style="-fx-opacity: initial">
+                <graphic>
+                    <Button fx:id="addTabButton">
+                        <graphic>
+                            <Glyph fontFamily="FontAwesome" icon="PLUS"/>
+                        </graphic>
+                    </Button>
+                </graphic>
+            </Tab>
         </TabPane>
     </center>
     <left>
-        <ToolBar fx:id="sideBar" orientation="VERTICAL" BorderPane.alignment="CENTER">
-            <Button BorderPane.alignment="CENTER" fx:id="addTabButton">
-                <graphic>
-                    <Glyph fontFamily="FontAwesome" icon="PLUS"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Add new tab!"/>
-                </tooltip>
-            </Button>
-            <Button fx:id="themeSwitcherButton" onAction="#switchTheme">
-                <graphic>
-                    <Glyph fontFamily="FontAwesome" icon="LIGHTBULB_ALT"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Turn off the lights!"/>
-                </tooltip>
-            </Button>
-            <Button mnemonicParsing="false">
+        <ToolBar fx:id="sideBar" orientation="VERTICAL">
+            <ImageView preserveRatio="true" fitWidth="32">
+                <Image url="http://icons.iconarchive.com/icons/dakirby309/simply-styled/128/Internet-Explorer-icon.png"/>
+            </ImageView>
+            <MenuButton fx:id="globalHistoryButton">
                 <graphic>
                     <Glyph fontFamily="FontAwesome" icon="HISTORY"/>
+                </graphic>
+            </MenuButton>
+            <Button onAction="#openSettingsPopup">
+                <graphic>
+                    <Glyph fontFamily="FontAwesome" icon="GEAR"/>
                 </graphic>
             </Button>
         </ToolBar>

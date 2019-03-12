@@ -8,31 +8,42 @@
 <Tab xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
      fx:controller="org.masanek.TabController"
      fx:id="tab">
-    <BorderPane prefHeight="200.0" prefWidth="200.0">
+    <contextMenu>
+        <ContextMenu>
+            <items>
+                <MenuItem text="Close" onAction="#closeTab"/>
+                <MenuItem text="Close all to the right"/>
+                <MenuItem text="Close all to the left"/>
+                <MenuItem text="Close all"/>
+            </items>
+        </ContextMenu>
+    </contextMenu>
+    <BorderPane>
         <top>
-            <SplitPane dividerPositions="0.5" orientation="VERTICAL" BorderPane.alignment="CENTER">
-                <ToolBar fx:id="toolbar" prefHeight="40.0" prefWidth="200.0">
-                    <Button fx:id="previousButton" disable="true" mnemonicParsing="false" onAction="#loadPrevious">
+            <SplitPane orientation="VERTICAL">
+                <ToolBar fx:id="toolbar">
+                    <Button fx:id="previousButton" disable="true" onAction="#loadPrevious">
                         <graphic>
                             <Glyph fontFamily="FontAwesome" icon="CHEVRON_LEFT"/>
                         </graphic>
                     </Button>
-                    <Button fx:id="nextButton" disable="true" mnemonicParsing="false" onAction="#loadNext">
+                    <Button fx:id="nextButton" disable="true" onAction="#loadNext">
                         <graphic>
                             <Glyph fontFamily="FontAwesome" icon="CHEVRON_RIGHT"/>
                         </graphic>
                     </Button>
-                    <Button mnemonicParsing="false" onAction="#reload">
+                    <Button onAction="#reload">
                         <graphic>
                             <Glyph fontFamily="FontAwesome" icon="REFRESH"/>
                         </graphic>
                     </Button>
-                    <Button mnemonicParsing="false" onAction="#home">
+                    <Button onAction="#home">
                         <graphic>
                             <Glyph fontFamily="FontAwesome" icon="HOME"/>
                         </graphic>
                     </Button>
-                    <CustomTextField fx:id="urlTextField" prefWidth="1500.0" promptText="Webseite" onAction="#onUrlField">
+                    <CustomTextField fx:id="urlTextField" prefWidth="1500.0" promptText="Webseite"
+                                     onAction="#onUrlField">
                         <right>
                             <Glyph fontFamily="FontAwesome" icon="SEARCH"/>
                         </right>
@@ -51,20 +62,31 @@
                             <Glyph fontFamily="FontAwesome" icon="NAVICON"/>
                         </graphic>
                     </MenuButton>
-                    <ChoiceBox prefWidth="150.0">
-
-                    </ChoiceBox>
                 </ToolBar>
-                <ToolBar prefHeight="40.0" prefWidth="200.0">
-                    <Button mnemonicParsing="false" text="Bookmark 1"/>
+                <ToolBar fx:id="bookmarksBar">
+                    <contextMenu>
+                        <ContextMenu>
+                            <items>
+                                <MenuItem text="Create new bookmark" onAction="#openCreateBookmarkDialog"/>
+                                <MenuItem text="Create new CATEGORIZED bookmark"/>
+                            </items>
+                        </ContextMenu>
+                    </contextMenu>
+                    <Button mnemonicParsing="false" text="Bookmark 1">
+                        <graphic>
+                            <Glyph fontFamily="FontAwesome" icon="FOLDER"/>
+                        </graphic>
+                    </Button>
+                    <Separator/>
+                    <Button mnemonicParsing="false" text="Bookmark 2"/>
                 </ToolBar>
             </SplitPane>
         </top>
         <center>
-            <WebView fx:id="webView" BorderPane.alignment="CENTER"/>
+            <WebView fx:id="webView"/>
         </center>
         <bottom>
-            <ToolBar onMouseClicked="#showProgressInfo" BorderPane.alignment="CENTER_RIGHT">
+            <ToolBar onMouseClicked="#showProgressInfo">
                 <Label fx:id="statusLabel"/>
                 <ProgressBar fx:id="progressBar" prefWidth="200.0" progress="0.0"/>
             </ToolBar>
